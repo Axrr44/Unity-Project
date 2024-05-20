@@ -15,6 +15,48 @@ public class AvatarCreator : MonoBehaviour
     public TMP_InputField userImageURLInputField;
     public Button createAvatar;
     public SkinnedMeshRenderer avatarSkinnedMeshRenderer;
+
+    [Header("Lights")]
+    public Light _light1;
+    public Light _light2;
+    public Light _light3;
+    public Light _light4;
+    public Light _light5;
+    public TMP_InputField _lightIntensityInputField1;
+    public TMP_InputField _lightIntensityInputField2;
+    public TMP_InputField _lightIntensityInputField3;
+    public TMP_InputField _lightIntensityInputField4;
+    public TMP_InputField _lightIntensityInputField5;
+    public TMP_InputField _lightColorInputField1;
+    public TMP_InputField _lightColorInputField2;
+    public TMP_InputField _lightColorInputField3;
+    public TMP_InputField _lightColorInputField4;
+    public TMP_InputField _lightColorInputField5;
+    public Button _setupLights;
+
+    [Header("Skin Tones")]
+    public Material _mouthMaterial;
+    public Material _lipsMaterial;
+    public Material _legsMaterial;
+    public Material _headMaterial;
+    public Material _bodyMaterial;
+    public Material _armsMaterial;
+
+    public Texture _mouthTexture;
+    public Texture _lipsTexture;
+    public Texture _legsTexture;
+    public Texture _headTexture;
+    public Texture _bodyTexture;
+    public Texture _armsTexture;
+
+    public TMP_InputField _mouthMaterialInputField;
+    public TMP_InputField _lipsMaterialInputField;
+    public TMP_InputField _legsMaterialInputField;
+    public TMP_InputField _headMaterialInputField;
+    public TMP_InputField _bodyMaterialInputField;
+    public TMP_InputField _armsMaterialInputField;
+
+
     void Start()
     {
         // Allow insecure connections (not recommended for production)
@@ -33,7 +75,136 @@ public class AvatarCreator : MonoBehaviour
         ResetAvatar();
         CallCreateAvatarAPI(jsonRequestBody);
     }
+    public void SetupLights()
+    {
+        ///////////////////////////////////////////
+        if (_lightIntensityInputField1.text != "")
+        {
+            if(float.TryParse(_lightIntensityInputField1.text, out float value))
+            {
+                _light1.intensity = value;
+            }
+        }
+        if(_lightColorInputField1.text != "")
+        {
+            if (ColorUtility.TryParseHtmlString(_lightColorInputField1.text, out Color color))
+            {
+                _light1.color = color;
+            }
+        }
+        ///////////////////////////////////////////
+        if (_lightIntensityInputField2.text != "")
+        {
+            if (float.TryParse(_lightIntensityInputField2.text, out float value))
+            {
+                _light2.intensity = value;
+            }
+        }
+        if (_lightColorInputField2.text != "")
+        {
+            if (ColorUtility.TryParseHtmlString(_lightColorInputField2.text, out Color color))
+            {
+                _light2.color = color;
+            }
+        }
+        ///////////////////////////////////////////
+        if (_lightIntensityInputField3.text != "")
+        {
+            if (float.TryParse(_lightIntensityInputField3.text, out float value))
+            {
+                _light3.intensity = value;
+            }
+        }
+        if (_lightColorInputField3.text != "")
+        {
+            if (ColorUtility.TryParseHtmlString(_lightColorInputField3.text, out Color color))
+            {
+                _light3.color = color;
+            }
+        }
+        ///////////////////////////////////////////
+        if (_lightIntensityInputField4.text != "")
+        {
+            if (float.TryParse(_lightIntensityInputField4.text, out float value))
+            {
+                _light4.intensity = value;
+            }
+        }
+        if (_lightColorInputField4.text != "")
+        {
+            if (ColorUtility.TryParseHtmlString(_lightColorInputField4.text, out Color color))
+            {
+                _light4.color = color;
+            }
+        }
+        ///////////////////////////////////////////
+        if (_lightIntensityInputField5.text != "")
+        {
+            if (float.TryParse(_lightIntensityInputField5.text, out float value))
+            {
+                _light5.intensity = value;
+            }
+        }
+        if (_lightColorInputField5.text != "")
+        {
+            if (ColorUtility.TryParseHtmlString(_lightColorInputField5.text, out Color color))
+            {
+                _light5.color = color;
+            }
+        }
+        ///////////////////////////////////////////
+    }
 
+    public void ResetTextures()
+    {
+        _mouthMaterial.mainTexture = _mouthTexture;
+        _lipsMaterial.mainTexture = _lipsTexture;
+        _legsMaterial.mainTexture = _legsTexture;
+        _headMaterial.mainTexture = _headTexture;
+        _bodyMaterial.mainTexture = _bodyTexture;
+        _armsMaterial.mainTexture = _armsTexture;
+    }
+    public void DownloadSkinTones()
+    {
+        if(_mouthMaterialInputField.text != "")
+        {
+            StartCoroutine(LoadSkinToneTexture(_mouthMaterialInputField.text, _mouthMaterial));
+        }
+        if (_lipsMaterialInputField.text != "")
+        {
+            StartCoroutine(LoadSkinToneTexture(_lipsMaterialInputField.text, _lipsMaterial));
+        }
+        if (_legsMaterialInputField.text != "")
+        {
+            StartCoroutine(LoadSkinToneTexture(_legsMaterialInputField.text, _legsMaterial));
+        }
+        if (_headMaterialInputField.text != "")
+        {
+            StartCoroutine(LoadSkinToneTexture(_headMaterialInputField.text, _headMaterial));
+        }
+        if (_bodyMaterialInputField.text != "")
+        {
+            StartCoroutine(LoadSkinToneTexture(_bodyMaterialInputField.text, _bodyMaterial));
+        }
+        if (_armsMaterialInputField.text != "")
+        {
+            StartCoroutine(LoadSkinToneTexture(_armsMaterialInputField.text, _armsMaterial));
+        }
+    }
+    private IEnumerator LoadSkinToneTexture(string url, Material material)
+    {
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
+        yield return www.SendWebRequest();
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log("www.error:" + www.error);
+        }
+        else
+        {
+            Texture2D myTexture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+            material.mainTexture = myTexture;
+        }
+    }
     private void ResetAvatar()
     {
         var faceMaterial = avatarSkinnedMeshRenderer.sharedMaterials.FirstOrDefault(mat => mat.name == "Face");
